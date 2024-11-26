@@ -92,21 +92,28 @@ const FezanCalculator = () => {
   }, []); // Le tableau vide signifie que cela ne s'exécute qu'une fois au montage
 
   const calculateFezanDay = (date) => {
-    const baseDate = new Date(2022, 10, 1); // 1er novembre 2022 (Hin/Fo)
+
+    
+    const baseDate = new Date(2022, 10, 3); // 1er novembre 2022 (Hin/Fo, position 8)
     const diffTime = date - baseDate;
+
+
+    console.log({date})
+    console.log({baseDate})
+    
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    
-    // On commence à Hin/Fo (position 8)
-    let position = ((diffDays % 9) + 8) % 9;
+    console.log(diffDays)
+    // Position correcte dans le cycle
+    let position = (diffDays % 9 + 9) % 9; // Assure un résultat positif
     const fezanDay = FEZAN_CYCLE[position];
-    
+  
     const dayName = date.toLocaleDateString('fr-FR', { weekday: 'long' });
     const formattedDate = date.toLocaleDateString('fr-FR', { 
       year: 'numeric', 
       month: 'long', 
       day: 'numeric' 
     });
-
+  
     // Vérifier les jours spéciaux
     let isSpecialDay = false;
     let specialMessage = '';
@@ -118,7 +125,7 @@ const FezanCalculator = () => {
         specialMessage = `Jour particulièrement propice (${fezanDay.name} un ${dayName})`;
       }
     }
-
+  
     return {
       ...fezanDay,
       jour: dayName,
@@ -127,6 +134,7 @@ const FezanCalculator = () => {
       specialMessage
     };
   };
+  
 
   const handleDateChange = (event) => {
     const date = new Date(event.target.value);
