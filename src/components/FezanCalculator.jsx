@@ -156,10 +156,10 @@ const FezanCalculator = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            Calculateur FEZAN
+            Calendrier FEZAN
           </motion.h1>
           <p className="text-lg text-indigo-600 opacity-80">
-            Découvrez la sagesse du calendrier traditionnel Fa
+          ‘’La géomancie ne ment jamais pour quelqu'un qui sait interpréter’’
           </p>
         </div>
 
