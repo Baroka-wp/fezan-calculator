@@ -9,18 +9,18 @@ interface DayDetailsProps {
 export const DayDetails = ({ fezanInfo }: DayDetailsProps) => {
   return (
     <motion.div 
-      className="bg-white rounded-2xl shadow-xl p-8"
+      className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 h-full flex flex-col"
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
     >
-      <div className={`mb-6 p-6 rounded-xl ${
+      <div className={`mb-6 p-4 sm:p-6 rounded-xl ${
         fezanInfo.type === 'favorable' ? 'bg-emerald-50' : 'bg-rose-50'
       }`}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold">
+          <h2 className="text-xl sm:text-2xl font-bold">
             {fezanInfo.name}
           </h2>
-          <span className={`px-4 py-1.5 rounded-full text-sm font-medium ${
+          <span className={`px-3 sm:px-4 py-1.5 rounded-full text-sm font-medium ${
             fezanInfo.type === 'favorable' 
               ? 'bg-emerald-100 text-emerald-700' 
               : 'bg-rose-100 text-rose-700'
@@ -47,8 +47,8 @@ export const DayDetails = ({ fezanInfo }: DayDetailsProps) => {
         </motion.div>
       )}
 
-      <div className="space-y-4">
-        <h3 className="text-xl font-medium text-gray-800">
+      <div className="flex-1 space-y-4">
+        <h3 className="text-lg sm:text-xl font-medium text-gray-800">
           Signification
         </h3>
         <p className="text-gray-600 leading-relaxed">
