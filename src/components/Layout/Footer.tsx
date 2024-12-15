@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Facebook, Twitter, Instagram, ChevronRight } from "lucide-react";
+import logo from "../../../image/logo.png";
 
 const Footer: React.FC = () => {
   const socialLinks = [
@@ -43,7 +44,7 @@ const Footer: React.FC = () => {
           <div className="flex flex-col items-start">
             <div className="flex items-center mb-4">
               <img 
-                src="../../../image/logo.png" 
+                src={logo}
                 alt="Fezan Logo" 
                 className="h-10 w-10 mr-3" 
               />
