@@ -4,7 +4,6 @@ import {
   format, 
   startOfMonth, 
   endOfMonth, 
-  eachDayOfInterval, 
   isSameMonth, 
   isSameDay, 
   addMonths, 
@@ -58,7 +57,7 @@ export const MonthlyCalendar = ({
 
   return (
     <motion.div 
-      className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 h-full"
+      className="bg-white rounded-2xl p-4 sm:p-6 h-full"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >

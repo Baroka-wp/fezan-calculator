@@ -1,19 +1,25 @@
-import { useState, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Star, Moon, Sun } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import HeroIllustration from '../assets/272138-P5OO85-689.jpg';
 import { calculateFezanDay } from '../utils/fezanCalculator';
 import { MonthlyCalendar } from '../components/MonthlyCalendar';
 import { DayDetails } from '../components/DayDetails';
 import type { FezanInfo } from '../types/fezan';
 import Header from '../components/Layout/Header';
 import Footer from '../components/Layout/Footer';
+import FezanExplanation from '../components/FezanExplanation';
 
-function Home() {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
-  const [fezanInfo, setFezanInfo] = useState<FezanInfo | null>(null);
+const Home: React.FC = () => {
+  const [selectedDate, setSelectedDate] = React.useState<Date>(new Date());
+  const [currentMonth, setCurrentMonth] = React.useState<Date>(new Date());
+  const [fezanInfo, setFezanInfo] = React.useState<FezanInfo | null>(null);
+  
+  // Refs for scrolling
+  const fezanExplanationRef = useRef<HTMLDivElement>(null);
+  const monthlyCalendarRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     setFezanInfo(calculateFezanDay(selectedDate));
   }, [selectedDate]);
 
@@ -21,61 +27,179 @@ function Home() {
     setCurrentMonth(newMonth);
   };
 
+  // Scroll to section functions
+  const scrollToFezanExplanation = () => {
+    monthlyCalendarRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const scrollToMonthlyCalendar = () => {
+    fezanExplanationRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-[#FF4500]/5 via-white to-[#FF4500]/5 font-['Inter', sans-serif]">
       {/* Navbar */}
-           <Header />
-      {/* Hero Section */}
-      <section className="relative py-8 sm:py-12 lg:py-16">
-        <div className="absolute inset-0 bg-gradient-to-b from-indigo-100/50 to-transparent" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center"
-          >
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-indigo-900 mb-4 sm:mb-6">
-              Découvrez le Calendrier FEZAN
-            </h1>
-            <p className="text-lg sm:text-xl text-indigo-700 max-w-2xl mx-auto mb-8 sm:mb-12">
-              Explorez l'ancienne sagesse du calendrier Fezan et découvrez les jours propices pour vos projets importants
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 max-w-3xl mx-auto">
-              <div className="bg-white/80 backdrop-blur rounded-xl p-4 text-center shadow-lg">
-                <Star className="h-6 w-6 text-indigo-500 mx-auto mb-2" />
-                <p className="text-sm font-medium text-indigo-900">5 jours favorables</p>
-              </div>
-              <div className="bg-white/80 backdrop-blur rounded-xl p-4 text-center shadow-lg">
-                <Moon className="h-6 w-6 text-amber-500 mx-auto mb-2" />
-                <p className="text-sm font-medium text-amber-900">4 jours défavorables</p>
-              </div>
-              <div className="bg-white/80 backdrop-blur rounded-xl p-4 text-center shadow-lg">
-                <Sun className="h-6 w-6 text-purple-500 mx-auto mb-2" />
-                <p className="text-sm font-medium text-purple-900">Cycle de 9 jours</p>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+      <Header />
       
+      {/* Hero Section */}
+      <div className="relative overflow-hidden pt-16 lg:pt-20">
+        {/* Decorative Background Shapes */}
+        <div className="absolute inset-0 pointer-events-none">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ 
+              opacity: [0.1, 0.3, 0.1],
+              scale: [0.5, 0.7, 0.5],
+              rotate: [0, 360]
+            }}
+            transition={{ 
+              duration: 10, 
+              repeat: Infinity, 
+              ease: "easeInOut" 
+            }}
+            className="absolute top-1/4 left-1/4 w-64 h-64 bg-[#FF4500]/10 rounded-full blur-2xl"
+          />
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ 
+              opacity: [0.1, 0.3, 0.1],
+              scale: [0.5, 0.7, 0.5],
+              rotate: [0, -360]
+            }}
+            transition={{ 
+              duration: 12, 
+              repeat: Infinity, 
+              ease: "easeInOut" 
+            }}
+            className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-[#FF4500]/10 rounded-full blur-2xl"
+          />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center py-12 lg:py-16">
+            {/* Text Content */}
+            <motion.div 
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, type: "spring", stiffness: 50 }}
+              className="space-y-6"
+            >
+              <div className="inline-flex items-center mb-4 px-4 py-2 bg-[#FF4500]/10 text-[#FF4500] rounded-full">
+                <span className="text-sm font-medium">Découvrez la Sagesse des temps Immémoriaux !</span>
+              </div>
+
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 leading-tight">
+                <span className="text-[#FF4500]">Découvrez le </span>FEZAN
+              </h1>
+              
+              <p className="text-xl text-gray-700 max-w-xl leading-relaxed">
+                Naviguez dans le temps avec l'ancienne sagesse géomantique. Chaque jour révèle son propre potentiel cosmique.
+              </p>
+              
+              <div className="flex space-x-4">
+                <motion.button
+                  onClick={scrollToFezanExplanation}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center px-6 py-3 bg-[#FF4500] text-white rounded-full font-semibold hover:bg-[#FF4500]/90 transition-all"
+                >
+                  Voir le calendrier
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </motion.button>
+                <motion.button
+                  onClick={scrollToMonthlyCalendar}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center px-6 py-3 border-2 border-[#FF4500] text-[#FF4500] rounded-full font-semibold hover:bg-[#FF4500]/10 transition-all"
+                >
+                  Savoir plus sur le Fezan
+                </motion.button>
+              </div>
+            </motion.div>
+
+            {/* Illustration */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, type: "spring", stiffness: 50 }}
+              className="flex justify-center items-center"
+            >
+              <img 
+                src={HeroIllustration} 
+                alt="Fezan Calendar Illustration" 
+                className="w-full max-w-xl object-contain"
+              />
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
+      {/* Fezan Explanation Section */}
+      <div ref={fezanExplanationRef}>
+        <FezanExplanation />
+      </div>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12 h-full" id='calendar'>
-          <MonthlyCalendar 
-            currentDate={currentMonth}
-            selectedDate={selectedDate}
-            onDateSelect={setSelectedDate}
-            onMonthChange={handleMonthChange}
-          />
-          {fezanInfo && <DayDetails fezanInfo={fezanInfo} />}
+      <motion.main 
+        ref={monthlyCalendarRef}
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, type: "spring", stiffness: 50 }}
+        className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-16"
+      >
+        <div className="text-center mb-12">
+          <motion.h2 
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 mb-6"
+          >
+            <span className="text-[#FF4500]">Explorez <br /></span> le Calendrier Fezan
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-xl text-gray-600 max-w-2xl mx-auto"
+          >
+            Découvrez les jours et leurs significations uniques dans le calendrier Fezan, un système ancestral de compréhension du temps.
+          </motion.p>
         </div>
-      </main>
+
+        <div 
+          className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12 bg-white/80 backdrop-blur-md rounded-2xl p-6 lg:p-8 border border-[#FF4500]/10"
+        >
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            <MonthlyCalendar 
+              currentDate={currentMonth}
+              selectedDate={selectedDate}
+              onDateSelect={setSelectedDate}
+              onMonthChange={handleMonthChange}
+            />
+          </motion.div>
+          
+          {fezanInfo && (
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              viewport={{ once: true }}
+            >
+              <DayDetails fezanInfo={fezanInfo} />
+            </motion.div>
+          )}
+        </div>
+      </motion.main>
 
       {/* Footer */}
-        <Footer/>
+      <Footer/>
     </div>
   );
-}
+};
 
 export default Home;

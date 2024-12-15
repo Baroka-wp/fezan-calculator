@@ -1,118 +1,159 @@
-import { MenuIcon } from "lucide-react";
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import logo from "../../../image/logo.png"
+import React, { useState, useEffect } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
 
-function Header() {
-  const [isOpen, setIsOpen] = useState(false);
+const Header: React.FC = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { scrollYProgress } = useScroll();
 
-  const handleToggle = () => {
-    setIsOpen(!isOpen);
-  };
+  // Dynamic header transformations
+  const backgroundColor = useTransform(
+    scrollYProgress,
+    [0, 0.1],
+    ['rgba(255, 69, 0, 0.05)', 'rgba(255, 69, 0, 0.9)']
+  );
+  const boxShadow = useTransform(
+    scrollYProgress,
+    [0, 0.1],
+    ['0 0 0 0 rgba(0,0,0,0)', '0 4px 6px -1px rgba(0,0,0,0.1)']
+  );
+  
+  // More dramatic height transformation
+  const headerHeight = useTransform(
+    scrollYProgress,
+    [0, 0.1],
+    ['5rem', '3rem']  
+  );
+  
+  // Logo size transformation
+  const logoSize = useTransform(
+    scrollYProgress,
+    [0, 0.1],
+    ['3rem', '2rem']  
+  );
+  
+  // Logo text size transformation
+  const logoTextSize = useTransform(
+    scrollYProgress,
+    [0, 0.1],
+    ['1.75rem', '1.25rem']  
+  );
 
-  const closeMenu = () => {
-    setIsOpen(false);
+  // Update CSS variable for header height
+  useEffect(() => {
+    const updateHeaderHeight = () => {
+      const isMobile = window.innerWidth <= 768;
+      const height = isMobile ? 64 : 80;  
+      document.documentElement.style.setProperty('--header-height', `${height}px`);
+    };
+
+    // Initial setup
+    updateHeaderHeight();
+
+    // Listen for resize events
+    window.addEventListener('resize', updateHeaderHeight);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', updateHeaderHeight);
+    };
+  }, []);
+
+  const navItems = [
+    { name: 'Accueil', path: '/' },
+    { name: 'Événements', path: '/culturalevents' },
+    { name: 'Le Faa', path: '/fezan' },
+    { name: 'Les prenoms', path: '/name-meaning' },
+    { name: 'Contact', path: '/contact' }
+  ];
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
   };
 
   return (
-    <header className="w-full relative py-2 sm:py-3 bg-white shadow">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-        {/* Logo */}
-        <Link to={"/"} className="text-indigo-900 font-bold text-lg sm:text-2xl flex items-center">
-          <img src={logo} alt="logo" className="h-20 w-[80px]" />
-          FEZAN
-        </Link>
-
-        {/* Navigation Menu */}
-        <nav className="hidden lg:flex space-x-6">
-          <Link to={"/"} className="text-indigo-700 hover:text-indigo-900 font-medium">
-            Calendrier
-          </Link>
-          <Link to="/culturalevents" className="text-indigo-700 hover:text-indigo-900 font-medium">
-            Évènements Culturels
-          </Link>
-          <a href="https://vodundays.bj/" target="_blank" rel="noopener noreferrer" className="text-indigo-700 hover:text-indigo-900 font-medium">
-            Vodoun Day
-          </a>
-          <Link to="/name-meaning" className="text-indigo-700 hover:text-indigo-900 font-medium">
-            Signification des Prénoms
-          </Link>
-          <Link to="/fezan" className="text-indigo-700 hover:text-indigo-900 font-medium">
-            Le Faa
-          </Link>
-        </nav>
-
-        {/* Responsive Menu */}
-        <div className="lg:hidden">
-          <button
-            className="text-indigo-900 focus:outline-none cursor-pointer"
-            onClick={handleToggle}
-            aria-expanded={isOpen}
+    <motion.header 
+      style={{ 
+        backgroundColor, 
+        boxShadow,
+        height: headerHeight
+      }}
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-sm bg-gradient-to-br from-[#FF4500]/5 via-white to-[#FF4500]/5"
+    >
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 h-full">
+        <div className="flex justify-between items-center h-full">
+          {/* Logo */}
+          <Link 
+            to="/" 
+            className="flex items-center font-bold text-gray-800 hover:text-gray-600 transition-colors"
           >
-            <MenuIcon />
-          </button>
+            <motion.img 
+              src="../../../image/logo.png" 
+              alt="logo" 
+              style={{ 
+                height: logoSize,
+                width: logoSize
+              }}
+              className="mr-3 object-contain" 
+            />
+            <motion.span 
+              style={{ fontSize: logoTextSize }}
+              className="font-['Inter', sans-serif] font-semibold tracking-tight"
+            >
+              FEZAN
+            </motion.span>
+          </Link>
 
-          
-          {isOpen && (
-            <>
-             
-              <div
-                className="fixed inset-0 bg-black bg-opacity-35 z-10"
-                onClick={closeMenu}
-              ></div>
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex space-x-6">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className="font-['Inter', sans-serif] text-gray-700 hover:text-gray-900 transition-colors font-medium tracking-tight"
+              >
+                {item.name}
+              </Link>
+            ))}
+          </nav>
 
-              {/* Mobile Menu */}
-              <nav className="fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-20 flex flex-col gap-4 p-6">
-                <button
-                  className="text-indigo-900 self-end focus:outline-none"
-                  onClick={closeMenu}
-                  aria-label="Close navigation menu"
-                >
-                  ✕
-                </button>
-                <Link
-                  to={'/'}
-                  className="text-indigo-700 hover:text-indigo-900 font-medium"
-                  onClick={closeMenu}
-                >
-                  Calendrier
-                </Link>
-                <Link
-                  to={'/culturalevents'}
-                  className="text-indigo-700 hover:text-indigo-900 font-medium"
-                  onClick={closeMenu}
-                >
-                  Évènements Culturels
-                </Link>
-                <a
-                  href="https://vodundays.bj/"
-                  target="_blank"
-                  className="text-indigo-700 hover:text-indigo-900 font-medium"
-                  onClick={closeMenu}
-                >
-                  Vodoun Day
-                </a>
-                <Link
-                  to={'/name-meaning'}
-                  className="text-indigo-700 hover:text-indigo-900 font-medium"
-                  onClick={closeMenu}
-                >
-                  Signification des Prénoms
-                </Link>
-                <Link
-                  to={'/fezan'}
-                  className="text-indigo-700 hover:text-indigo-900 font-medium"
-                  onClick={closeMenu}
-                >
-                  Le Faa
-                </Link>
-              </nav>
-            </>
-          )}
+          {/* Mobile Menu Toggle */}
+          <div className="md:hidden">
+            <button 
+              onClick={toggleMenu}
+              className="text-gray-700 hover:text-gray-900 transition-colors"
+            >
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="md:hidden absolute top-full left-0 right-0 bg-white/90 backdrop-blur-md shadow-lg"
+          >
+            <div className="px-4 pt-2 pb-4 space-y-2">
+              {navItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={toggleMenu}
+                  className="block py-2 font-['Inter', sans-serif] text-gray-800 hover:text-gray-600 transition-colors font-medium"
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </div>
-    </header>
+    </motion.header>
   );
-}
+};
 
 export default Header;

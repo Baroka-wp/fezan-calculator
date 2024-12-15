@@ -2,6 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --header-height: 160px; /* Initial large header height */
+}
+
+@media (max-width: 768px) {
+  :root {
+    --header-height: 64px; /* Smaller height for mobile */
+  }
+}
+
+body {
+  padding-top: var(--header-height);
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Additional global styles can be added here */
 
 .form-group {
   @apply mb-6;
