@@ -1,6 +1,7 @@
 import { MenuIcon } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import logo from "../../../image/logo.png"
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,7 +19,7 @@ function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
         {/* Logo */}
         <Link to={"/"} className="text-indigo-900 font-bold text-lg sm:text-2xl flex items-center">
-          <img src="/image/logo.png" alt="logo" className="h-20 w-[80px]" />
+          <img src={logo} alt="logo" className="h-20 w-[80px]" />
           FEZAN
         </Link>
 
