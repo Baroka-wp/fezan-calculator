@@ -32,7 +32,6 @@ export const DayDetails = ({ fezanInfo }: DayDetailsProps) => {
           {fezanInfo.date} • {fezanInfo.jour}
         </p>
       </div>
-
       {fezanInfo.isSpecialDay && (
         <motion.div 
           className="mb-6 p-4 bg-amber-50 rounded-xl border border-amber-200 flex items-center gap-3"
