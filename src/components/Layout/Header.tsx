@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
+import Logo from '../../assets/logo.png';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -89,7 +90,7 @@ const Header: React.FC = () => {
             className="flex items-center font-bold text-gray-800 hover:text-gray-600 transition-colors"
           >
             <motion.img 
-              src="../../../image/logo.png" 
+              src={Logo}
               alt="logo" 
               style={{ 
                 height: logoSize,
