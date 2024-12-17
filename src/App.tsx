@@ -6,6 +6,7 @@ import NameMeaning from "./pages/NameMeaning";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Disclaimer from "./pages/Disclaimer";
 import ContactPage from "./pages/Contact";
+import Calendar from "./pages/Calendar";
 
 function App() {
   
@@ -15,6 +16,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home/> }/>
+          <Route path="/calendar" element={<Calendar/> }/>
           <Route path="/culturalevents" element={<CulturalEvents/> }/>
           <Route path="/fezan" element={<Fezan/> }/>
           <Route path="/name-meaning" element={<NameMeaning/> }/>

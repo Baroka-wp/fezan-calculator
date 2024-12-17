@@ -3,12 +3,12 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import HeroIllustration from '../assets/272138-P5OO85-689.jpg';
 import { calculateFezanDay } from '../utils/fezanCalculator';
-import { MonthlyCalendar } from '../components/MonthlyCalendar';
-import { DayDetails } from '../components/DayDetails';
 import type { FezanInfo } from '../types/fezan';
 import Header from '../components/Layout/Header';
 import Footer from '../components/Layout/Footer';
 import FezanExplanation from '../components/FezanExplanation';
+import MainContent from '../components/MainContent';
+import { Link } from 'react-router-dom';
 
 const Home: React.FC = () => {
   const [selectedDate, setSelectedDate] = React.useState<Date>(new Date());
@@ -134,67 +134,47 @@ const Home: React.FC = () => {
         </div>
       </div>
 
+      <div className="text-center mb-12">
+        <motion.h2 
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 mb-6"
+        >
+        <span className="text-[#FF4500]">Explorez <br /></span> le Calendrier Fezan
+        </motion.h2>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="text-xl text-gray-600 max-w-2xl mx-auto"
+        >
+          Découvrez les jours et leurs significations uniques dans le calendrier Fezan, un système ancestral de compréhension du temps.
+        </motion.p>
+      </div>
+
+      <MainContent
+        currentMonth={currentMonth}
+        selectedDate={selectedDate}
+        onDateSelect={setSelectedDate}
+        onMonthChange={handleMonthChange}
+        fezanInfo={fezanInfo}
+      />
+      
+      <div className="flex justify-center pb-16">
+        <Link 
+          to="/calendar" 
+          className="inline-flex items-center px-8 py-4 text-lg font-semibold text-white bg-[#FF4500] rounded-full hover:bg-[#FF6347] transition-colors duration-200"
+        >
+          Voir le Calendrier Complet
+          <ArrowRight className="ml-2 h-5 w-5" />
+        </Link>
+      </div>
+
       {/* Fezan Explanation Section */}
       <div ref={fezanExplanationRef}>
         <FezanExplanation />
       </div>
-
-      {/* Main Content */}
-      <motion.main 
-        ref={monthlyCalendarRef}
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, type: "spring", stiffness: 50 }}
-        className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-16"
-      >
-        <div className="text-center mb-12">
-          <motion.h2 
-            initial={{ opacity: 0, y: -20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 mb-6"
-          >
-            <span className="text-[#FF4500]">Explorez <br /></span> le Calendrier Fezan
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-xl text-gray-600 max-w-2xl mx-auto"
-          >
-            Découvrez les jours et leurs significations uniques dans le calendrier Fezan, un système ancestral de compréhension du temps.
-          </motion.p>
-        </div>
-
-        <div 
-          className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12 bg-white/80 backdrop-blur-md rounded-2xl p-6 lg:p-8 border border-[#FF4500]/10"
-        >
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            <MonthlyCalendar 
-              currentDate={currentMonth}
-              selectedDate={selectedDate}
-              onDateSelect={setSelectedDate}
-              onMonthChange={handleMonthChange}
-            />
-          </motion.div>
-          
-          {fezanInfo && (
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              viewport={{ once: true }}
-            >
-              <DayDetails fezanInfo={fezanInfo} />
-            </motion.div>
-          )}
-        </div>
-      </motion.main>
 
       {/* Footer */}
       <Footer/>
