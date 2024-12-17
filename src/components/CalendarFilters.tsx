@@ -22,7 +22,6 @@ export const CalendarFilters: React.FC<CalendarFiltersProps> = ({
     { id: 'favorable', label: 'Jours Favorables' },
     { id: 'fezan', label: 'Jours Fezan' },
     { id: 'date', label: 'Rechercher une date' },
-    { id: 'year', label: 'Par Année' },
   ];
 
   return (

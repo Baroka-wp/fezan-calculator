@@ -3,17 +3,25 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import HeroIllustration from '../assets/272138-P5OO85-689.jpg';
 import { calculateFezanDay } from '../utils/fezanCalculator';
+import { getFilteredDates } from '../utils/calendarFilters';
 import type { FezanInfo } from '../types/fezan';
 import Header from '../components/Layout/Header';
 import Footer from '../components/Layout/Footer';
 import FezanExplanation from '../components/FezanExplanation';
 import MainContent from '../components/MainContent';
-import { Link } from 'react-router-dom';
+import { CalendarFilters } from '../components/CalendarFilters';
+import { MonthSelector } from '../components/MonthSelector';
+import { FezanDaySelector } from '../components/FezanDaySelector';
+import { DateInput } from '../components/DateInput';
 
 const Home: React.FC = () => {
   const [selectedDate, setSelectedDate] = React.useState<Date>(new Date());
   const [currentMonth, setCurrentMonth] = React.useState<Date>(new Date());
   const [fezanInfo, setFezanInfo] = React.useState<FezanInfo | null>(null);
+  const [activeFilter, setActiveFilter] = React.useState('all');
+  const [filteredDates, setFilteredDates] = React.useState<{ date: Date; info: FezanInfo }[]>([]);
+  const [showDateInput, setShowDateInput] = React.useState(false);
+  const [selectedFezanDay, setSelectedFezanDay] = React.useState<string | null>(null);
   
   // Refs for scrolling
   const fezanExplanationRef = useRef<HTMLDivElement>(null);
@@ -23,9 +31,41 @@ const Home: React.FC = () => {
     setFezanInfo(calculateFezanDay(selectedDate));
   }, [selectedDate]);
 
-  const handleMonthChange = (newMonth: Date) => {
-    setCurrentMonth(newMonth);
+  const handleMonthChange = (date: Date) => {
+    setCurrentMonth(date);
   };
+
+  const handleFilterChange = (filter: string) => {
+    setActiveFilter(filter);
+    setSelectedFezanDay(null);
+    if (filter === 'date') {
+      setShowDateInput(true);
+    } else {
+      const newFilteredDates = getFilteredDates(currentMonth, filter);
+      setFilteredDates(newFilteredDates);
+    }
+  };
+
+  const handleDateSubmit = (date: Date) => {
+    setSelectedDate(date);
+    setCurrentMonth(date);
+    const info = calculateFezanDay(date);
+    setFezanInfo(info);
+    setShowDateInput(false);
+    setActiveFilter('all');
+  };
+
+  const handleFezanDaySelect = (dayName: string) => {
+    setSelectedFezanDay(dayName);
+    const newFilteredDates = getFilteredDates(currentMonth, 'fezan', dayName);
+    setFilteredDates(newFilteredDates);
+  };
+
+  // Update filtered dates when month or filter changes
+  React.useEffect(() => {
+    const newFilteredDates = getFilteredDates(currentMonth, activeFilter, selectedFezanDay);
+    setFilteredDates(newFilteredDates);
+  }, [currentMonth, activeFilter, selectedFezanDay]);
 
   // Scroll to section functions
   const scrollToFezanExplanation = () => {
@@ -141,7 +181,7 @@ const Home: React.FC = () => {
           transition={{ duration: 0.5 }}
           className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 mb-6"
         >
-        <span className="text-[#FF4500]">Explorez <br /></span> le Calendrier Fezan
+          <span className="text-[#FF4500]">Explorez <br /></span> le Calendrier Fezan
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -153,22 +193,96 @@ const Home: React.FC = () => {
         </motion.p>
       </div>
 
-      <MainContent
-        currentMonth={currentMonth}
-        selectedDate={selectedDate}
-        onDateSelect={setSelectedDate}
-        onMonthChange={handleMonthChange}
-        fezanInfo={fezanInfo}
-      />
-      
-      <div className="flex justify-center pb-16">
-        <Link 
-          to="/calendar" 
-          className="inline-flex items-center px-8 py-4 text-lg font-semibold text-white bg-[#FF4500] rounded-full hover:bg-[#FF6347] transition-colors duration-200"
-        >
-          Voir le Calendrier Complet
-          <ArrowRight className="ml-2 h-5 w-5" />
-        </Link>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <CalendarFilters
+          activeFilter={activeFilter}
+          onFilterChange={handleFilterChange}
+          currentMonth={currentMonth}
+        />
+
+        {/* Display filtered dates or main calendar */}
+        {activeFilter !== 'all' ? (
+          <div className="mt-8">
+            {/* Month selector for favorable days */}
+            {activeFilter === 'favorable' && (
+              <div className="mb-6">
+                <MonthSelector
+                  selectedMonth={currentMonth}
+                  onMonthSelect={handleMonthChange}
+                />
+              </div>
+            )}
+
+            {/* Fezan day selector */}
+            {activeFilter === 'fezan' && (
+              <div className="mb-6 space-y-4">
+                <MonthSelector
+                  selectedMonth={currentMonth}
+                  onMonthSelect={handleMonthChange}
+                />
+                <FezanDaySelector
+                  selectedDate={currentMonth}
+                  onDateChange={handleMonthChange}
+                  selectedFezanDay={selectedFezanDay}
+                  onFezanDaySelect={handleFezanDaySelect}
+                />
+              </div>
+            )}
+            
+            {filteredDates.length > 0 ? (
+              <div className="p-6 bg-white/80 backdrop-blur-md rounded-2xl border border-[#FF4500]/10">
+                <h3 className="text-xl font-semibold mb-4">
+                  {activeFilter === 'favorable' && `Jours Favorables - ${currentMonth.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}`}
+                  {activeFilter === 'fezan' && selectedFezanDay && `Jours ${selectedFezanDay} - ${currentMonth.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}`}
+                  {activeFilter === 'month' && 'Jours du Mois'}
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {filteredDates.map(({ date, info }) => (
+                    <div 
+                      key={date.toISOString()}
+                      className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                      onClick={() => {
+                        setSelectedDate(date);
+                        setActiveFilter('all');
+                      }}
+                    >
+                      <p className="font-medium">{info.date}</p>
+                      <p className={`${info.color} font-semibold`}>{info.name}</p>
+                      {info.isSpecialDay && (
+                        <p className="text-sm text-gray-600 mt-1">{info.specialMessage}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center text-gray-500 mt-8">
+                {activeFilter === 'fezan' && !selectedFezanDay 
+                  ? 'Sélectionnez un jour Fezan'
+                  : `Aucun résultat trouvé pour ${currentMonth.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}`
+                }
+              </div>
+            )}
+          </div>
+        ) : (
+          <MainContent
+            currentMonth={currentMonth}
+            selectedDate={selectedDate}
+            onDateSelect={setSelectedDate}
+            onMonthChange={handleMonthChange}
+            fezanInfo={fezanInfo}
+          />
+        )}
+
+        {showDateInput && (
+          <DateInput
+            onDateSubmit={handleDateSubmit}
+            onClose={() => {
+              setShowDateInput(false);
+              setActiveFilter('all');
+            }}
+          />
+        )}
       </div>
 
       {/* Fezan Explanation Section */}
