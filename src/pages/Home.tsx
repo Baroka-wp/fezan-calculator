@@ -1,9 +1,11 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import HeroIllustration from '../assets/272138-P5OO85-689.jpg';
 import { calculateFezanDay } from '../utils/fezanCalculator';
 import { getFilteredDates } from '../utils/calendarFilters';
+import { getLunarCalendar, getLunarDaysInMonth } from '../utils/lunarCalendarApi';
+import { getLunarPhase } from '../utils/lunarPhases';
 import type { FezanInfo } from '../types/fezan';
 import Header from '../components/Layout/Header';
 import Footer from '../components/Layout/Footer';
@@ -13,6 +15,7 @@ import { CalendarFilters } from '../components/CalendarFilters';
 import { MonthSelector } from '../components/MonthSelector';
 import { FezanDaySelector } from '../components/FezanDaySelector';
 import { DateInput } from '../components/DateInput';
+import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 
 const Home: React.FC = () => {
   const [selectedDate, setSelectedDate] = React.useState<Date>(new Date());
@@ -22,7 +25,13 @@ const Home: React.FC = () => {
   const [filteredDates, setFilteredDates] = React.useState<{ date: Date; info: FezanInfo }[]>([]);
   const [showDateInput, setShowDateInput] = React.useState(false);
   const [selectedFezanDay, setSelectedFezanDay] = React.useState<string | null>(null);
-  
+  const [lunarDays, setLunarDays] = React.useState<{
+    gregorianDate: Date;
+    lunarDay: number;
+    lunarMonth: number;
+    isLeap: boolean;
+  }[]>([]);
+
   // Refs for scrolling
   const fezanExplanationRef = useRef<HTMLDivElement>(null);
   const monthlyCalendarRef = useRef<HTMLDivElement>(null);
@@ -31,8 +40,11 @@ const Home: React.FC = () => {
     setFezanInfo(calculateFezanDay(selectedDate));
   }, [selectedDate]);
 
-  const handleMonthChange = (date: Date) => {
-    setCurrentMonth(date);
+  const handleMonthChange = (newDate: Date) => {
+    setCurrentMonth(newDate);
+    if (activeFilter === 'lunar') {
+      fetchLunarDays(newDate.getFullYear(), newDate.getMonth() + 1);
+    }
   };
 
   const handleFilterChange = (filter: string) => {
@@ -40,11 +52,30 @@ const Home: React.FC = () => {
     setSelectedFezanDay(null);
     if (filter === 'date') {
       setShowDateInput(true);
+    } else if (filter === 'lunar') {
+      fetchLunarDays(currentMonth.getFullYear(), currentMonth.getMonth() + 1);
     } else {
       const newFilteredDates = getFilteredDates(currentMonth, filter);
       setFilteredDates(newFilteredDates);
     }
   };
+
+  const fetchLunarDays = async (year: number, month: number) => {
+    try {
+      const lunarData = await getLunarCalendar(year, month);
+      const monthLunarDays = getLunarDaysInMonth(lunarData);
+      setLunarDays(monthLunarDays);
+    } catch (error) {
+      console.error('Error fetching lunar days:', error);
+      setLunarDays([]);
+    }
+  };
+
+  useEffect(() => {
+    if (activeFilter === 'lunar') {
+      fetchLunarDays(currentMonth.getFullYear(), currentMonth.getMonth() + 1);
+    }
+  }, [activeFilter]);
 
   const handleDateSubmit = (date: Date) => {
     setSelectedDate(date);
@@ -74,6 +105,79 @@ const Home: React.FC = () => {
 
   const scrollToMonthlyCalendar = () => {
     fezanExplanationRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const renderDays = () => {
+    if (activeFilter === 'lunar' && lunarDays.length > 0) {
+      return lunarDays.map((lunarInfo, index) => {
+        const phase = getLunarPhase(lunarInfo.lunarDay);
+        return (
+          <div
+            key={index}
+            className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+            onClick={() => {
+              setSelectedDate(lunarInfo.gregorianDate);
+              setActiveFilter('all');
+            }}
+          >
+            <p className="font-medium">
+              {lunarInfo.gregorianDate.toLocaleDateString('fr-FR', { 
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+              })}
+            </p>
+            <div className="text-[#FF4500] font-semibold flex flex-col gap-1">
+              <p className="text-2xl">{phase.emoji}</p>
+              <p>{phase.name}</p>
+              <p>
+                Jour {lunarInfo.lunarDay} - Mois {lunarInfo.lunarMonth}
+                {lunarInfo.isLeap && ' (Mois bissextile)'}
+              </p>
+            </div>
+          </div>
+        );
+      });
+    }
+    return null;
+  };
+
+  const MonthYearSelector = () => {
+    const currentYear = currentMonth.getFullYear();
+    const months = Array.from({ length: 12 }, (_, i) => ({
+      value: i,
+      name: new Date(2024, i).toLocaleDateString('fr-FR', { month: 'long' })
+    }));
+
+    const years = Array.from({ length: 21 }, (_, i) => 2020 + i);
+
+    return (
+      <div className="flex items-center justify-center gap-3 mb-4">
+        <select
+          value={currentMonth.getMonth()}
+          onChange={(e) => handleMonthChange(new Date(currentYear, Number(e.target.value)))}
+          className="px-3 py-1.5 bg-white rounded-md border border-gray-300 text-sm font-medium text-gray-700 capitalize focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+        >
+          {months.map(({ value, name }) => (
+            <option key={value} value={value} className="capitalize">
+              {name}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={currentYear}
+          onChange={(e) => handleMonthChange(new Date(Number(e.target.value), currentMonth.getMonth()))}
+          className="px-3 py-1.5 bg-white rounded-md border border-gray-300 text-sm font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+        >
+          {years.map(year => (
+            <option key={year} value={year}>
+              {year}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
   };
 
   return (
@@ -204,22 +308,16 @@ const Home: React.FC = () => {
         {activeFilter !== 'all' ? (
           <div className="mt-8">
             {/* Month selector for favorable days */}
-            {activeFilter === 'favorable' && (
+            {(activeFilter === 'favorable' || activeFilter === 'lunar') && (
               <div className="mb-6">
-                <MonthSelector
-                  selectedMonth={currentMonth}
-                  onMonthSelect={handleMonthChange}
-                />
+                <MonthYearSelector />
               </div>
             )}
 
             {/* Fezan day selector */}
             {activeFilter === 'fezan' && (
               <div className="mb-6 space-y-4">
-                <MonthSelector
-                  selectedMonth={currentMonth}
-                  onMonthSelect={handleMonthChange}
-                />
+                <MonthYearSelector />
                 <FezanDaySelector
                   selectedDate={currentMonth}
                   onDateChange={handleMonthChange}
@@ -229,30 +327,35 @@ const Home: React.FC = () => {
               </div>
             )}
             
-            {filteredDates.length > 0 ? (
+            {filteredDates.length > 0 || (activeFilter === 'lunar' && lunarDays.length > 0) ? (
               <div className="p-6 bg-white/80 backdrop-blur-md rounded-2xl border border-[#FF4500]/10">
                 <h3 className="text-xl font-semibold mb-4">
                   {activeFilter === 'favorable' && `Jours Favorables - ${currentMonth.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}`}
                   {activeFilter === 'fezan' && selectedFezanDay && `Jours ${selectedFezanDay} - ${currentMonth.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}`}
+                  {activeFilter === 'lunar' && `Jours Lunaires - ${currentMonth.getFullYear()} ${currentMonth.toLocaleDateString('fr-FR', { month: 'long' })}`}
                   {activeFilter === 'month' && 'Jours du Mois'}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {filteredDates.map(({ date, info }) => (
-                    <div 
-                      key={date.toISOString()}
-                      className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                      onClick={() => {
-                        setSelectedDate(date);
-                        setActiveFilter('all');
-                      }}
-                    >
-                      <p className="font-medium">{info.date}</p>
-                      <p className={`${info.color} font-semibold`}>{info.name}</p>
-                      {info.isSpecialDay && (
-                        <p className="text-sm text-gray-600 mt-1">{info.specialMessage}</p>
-                      )}
-                    </div>
-                  ))}
+                  {activeFilter === 'lunar' ? (
+                    renderDays()
+                  ) : (
+                    filteredDates.map(({ date, info }) => (
+                      <div 
+                        key={date.toISOString()}
+                        className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                        onClick={() => {
+                          setSelectedDate(date);
+                          setActiveFilter('all');
+                        }}
+                      >
+                        <p className="font-medium">{info.date}</p>
+                        <p className={`${info.color} font-semibold`}>{info.name}</p>
+                        {info.isSpecialDay && (
+                          <p className="text-sm text-gray-600 mt-1">{info.specialMessage}</p>
+                        )}
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             ) : (

@@ -21,6 +21,7 @@ export const CalendarFilters: React.FC<CalendarFiltersProps> = ({
     { id: 'all', label: `Calendrier de ${currentMonthName}` },
     { id: 'favorable', label: 'Jours Favorables' },
     { id: 'fezan', label: 'Jours Fezan' },
+    { id: 'lunar', label: 'Jours Lunaires' },
     { id: 'date', label: 'Rechercher une date' },
   ];
 
