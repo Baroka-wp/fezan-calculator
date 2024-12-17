@@ -350,30 +350,57 @@ const Home: React.FC = () => {
             )}
             
             {filteredDates.length > 0 || (activeFilter === 'lunar' && lunarDays.length > 0) ? (
-              <div className="p-6 bg-white/80 backdrop-blur-md rounded-2xl border border-[#FF4500]/10">
-                <h3 className="text-xl font-semibold mb-4">
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3">
+                <h3 className="text-sm font-medium mb-2 text-gray-900">
                   {activeFilter === 'favorable' && `Jours Favorables - ${currentMonth.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}`}
                   {activeFilter === 'fezan' && selectedFezanDay && `Jours ${selectedFezanDay} - ${currentMonth.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}`}
-                  {activeFilter === 'lunar' && `Jours Lunaires - ${currentMonth.getFullYear()} ${currentMonth.toLocaleDateString('fr-FR', { month: 'long' })}`}
+                  {activeFilter === 'lunar' && `Jours Lunaires - ${currentMonth.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}`}
                   {activeFilter === 'month' && 'Jours du Mois'}
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
                   {activeFilter === 'lunar' ? (
-                    renderDays()
+                    lunarDays.map((lunarInfo, index) => {
+                      const phase = getLunarPhase(lunarInfo.lunarDay);
+                      return (
+                        <div
+                          key={index}
+                          className="p-2 bg-white rounded-lg hover:shadow-sm transition-shadow cursor-pointer"
+                          onClick={() => {
+                            setSelectedDate(lunarInfo.gregorianDate);
+                            setActiveFilter('all');
+                          }}
+                        >
+                          <div className="flex items-start gap-2">
+                            <span className="text-xl">{phase.emoji}</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-900 truncate">
+                                {lunarInfo.gregorianDate.getDate()} {lunarInfo.gregorianDate.toLocaleDateString('fr-FR', { month: 'short' })}
+                              </p>
+                              <p className="text-xs text-[#FF4500]">{phase.name}</p>
+                              <p className="text-xs text-gray-500">
+                                Jour {lunarInfo.lunarDay}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
                   ) : (
                     filteredDates.map(({ date, info }) => (
                       <div 
                         key={date.toISOString()}
-                        className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                        className="p-2 bg-white rounded-lg hover:shadow-sm transition-shadow cursor-pointer"
                         onClick={() => {
                           setSelectedDate(date);
                           setActiveFilter('all');
                         }}
                       >
-                        <p className="font-medium">{info.date}</p>
-                        <p className={`${info.color} font-semibold`}>{info.name}</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {date.getDate()} {date.toLocaleDateString('fr-FR', { month: 'short' })}
+                        </p>
+                        <p className={`text-xs ${info.color}`}>{info.name}</p>
                         {info.isSpecialDay && (
-                          <p className="text-sm text-gray-600 mt-1">{info.specialMessage}</p>
+                          <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{info.specialMessage}</p>
                         )}
                       </div>
                     ))
@@ -381,10 +408,10 @@ const Home: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className="text-center text-gray-500 mt-8">
+              <div className="text-sm text-gray-500 mt-2">
                 {activeFilter === 'fezan' && !selectedFezanDay 
                   ? 'Sélectionnez un jour Fezan'
-                  : `Aucun résultat trouvé pour ${currentMonth.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}`
+                  : `Aucun résultat pour ${currentMonth.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}`
                 }
               </div>
             )}

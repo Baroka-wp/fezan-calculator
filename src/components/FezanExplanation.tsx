@@ -6,19 +6,48 @@ const FezanDays = [
   {
     name: 'Mêdjo (1er jour)',
     type: 'Favorable',
-    description: 'C\'est le premier jour lunaire, la naissance de l\'être humain (point de départ de la vie). C\'est le jour favorable par excellence pour entreprendre quelque chose d\'important surtout quand il tombe un jeudi.'
+    description: 'Premier jour lunaire, naissance de l\'être humain. Particulièrement favorable le jeudi pour entreprendre quelque chose d\'important.'
   },
   {
     name: 'Mêkou (2ème jour)',
     type: 'Défavorable',
-    description: 'C\'est le deuxième jour lunaire, il signifie la mort de l\'être humain et fait partie des jours de malheur. Il est donc déconseillé de le choisir pour un événement important. Cependant, il peut être adapté pour les enterrements ou aux sacrifices pour les défunts.'
+    description: 'Deuxième jour lunaire, symbolise la mort. Adapté uniquement pour les enterrements ou sacrifices aux défunts.'
   },
   {
     name: 'Vodoun (3ème jour)',
     type: 'Favorable',
-    description: 'Troisième jour lunaire, c\'est le jour du sacré, jour vaudou. Il s\'interprète comme la mutation en un esprit ou en un dieu de celui meurt et est considéré comme un jour favorable. Il est tout particulièrement recommandé pour démarrer les cérémonies cultuelles lorsque c\'est un dimanche.'
+    description: 'Jour du sacré, particulièrement recommandé pour les cérémonies cultuelles le dimanche.'
   },
-  // Add other days similarly...
+  {
+    name: 'Azon (4ème jour)',
+    type: 'Défavorable',
+    description: 'Jour de maladie. La mort incarnée peut hanter et apporter malédiction.'
+  },
+  {
+    name: 'Vo (5ème jour)',
+    type: 'Favorable',
+    description: 'Jour du sacrifice, propice pour conjurer le mauvais sort ou rompre un maléfice.'
+  },
+  {
+    name: 'Akoué/Houé (6ème jour)',
+    type: 'Défavorable',
+    description: 'Jour du jugement. Risque de disputes, conflits et menaces.'
+  },
+  {
+    name: 'Bo (7ème jour)',
+    type: 'Favorable',
+    description: 'Jour propice pour jeter des sorts, particulièrement le mardi.'
+  },
+  {
+    name: 'Hin/Fo (8ème jour)',
+    type: 'Défavorable',
+    description: 'Jour de la misère. Déconseillé pour entreprendre quelque chose d\'important.'
+  },
+  {
+    name: 'Fa (9ème jour)',
+    type: 'Favorable',
+    description: 'Jour parfait pour consulter l\'oracle et combattre les malheurs.'
+  }
 ];
 
 const FezanExplanation: React.FC = () => {
@@ -89,7 +118,7 @@ const FezanExplanation: React.FC = () => {
           {/* Fezan Days */}
           <div className="space-y-4">
             <h3 className="text-3xl font-bold text-center text-gray-900 mb-8">
-              Les 9 Jours du Fezan
+              Les 9 jours du Fezan
             </h3>
             {FezanDays.map((day, index) => (
               <motion.div
