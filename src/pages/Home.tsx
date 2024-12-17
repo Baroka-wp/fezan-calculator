@@ -146,36 +146,58 @@ const Home: React.FC = () => {
     const currentYear = currentMonth.getFullYear();
     const months = Array.from({ length: 12 }, (_, i) => ({
       value: i,
-      name: new Date(2024, i).toLocaleDateString('fr-FR', { month: 'long' })
+      name: new Date(2024, i).toLocaleDateString('fr-FR', { month: 'long' }),
+      shortName: new Date(2024, i).toLocaleDateString('fr-FR', { month: 'short' })
     }));
 
     const years = Array.from({ length: 21 }, (_, i) => 2020 + i);
 
     return (
-      <div className="flex items-center justify-center gap-3 mb-4">
-        <select
-          value={currentMonth.getMonth()}
-          onChange={(e) => handleMonthChange(new Date(currentYear, Number(e.target.value)))}
-          className="px-3 py-1.5 bg-white rounded-md border border-gray-300 text-sm font-medium text-gray-700 capitalize focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-        >
-          {months.map(({ value, name }) => (
-            <option key={value} value={value} className="capitalize">
-              {name}
-            </option>
-          ))}
-        </select>
+      <div className="w-full max-w-4xl mx-auto">
+        <div className="flex items-center justify-center gap-4 mb-3">
+          <button
+            onClick={() => handleMonthChange(new Date(currentYear - 1, currentMonth.getMonth()))}
+            className="p-1 hover:text-[#FF4500] transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
 
-        <select
-          value={currentYear}
-          onChange={(e) => handleMonthChange(new Date(Number(e.target.value), currentMonth.getMonth()))}
-          className="px-3 py-1.5 bg-white rounded-md border border-gray-300 text-sm font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-        >
-          {years.map(year => (
-            <option key={year} value={year}>
-              {year}
-            </option>
+          <select
+            value={currentYear}
+            onChange={(e) => handleMonthChange(new Date(Number(e.target.value), currentMonth.getMonth()))}
+            className="text-lg font-medium text-gray-900 bg-transparent focus:outline-none cursor-pointer hover:text-[#FF4500] transition-colors"
+          >
+            {years.map(year => (
+              <option key={year} value={year}>{year}</option>
+            ))}
+          </select>
+
+          <button
+            onClick={() => handleMonthChange(new Date(currentYear + 1, currentMonth.getMonth()))}
+            className="p-1 hover:text-[#FF4500] transition-colors"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
+          {months.map(({ value, name, shortName }) => (
+            <button
+              key={value}
+              onClick={() => handleMonthChange(new Date(currentYear, value))}
+              className={`
+                py-1.5 px-3 rounded-lg text-sm font-medium transition-all
+                ${value === currentMonth.getMonth()
+                  ? 'bg-[#FF4500] text-white'
+                  : 'bg-white hover:bg-[#FF4500]/10 text-gray-700 hover:text-[#FF4500]'
+                }
+              `}
+            >
+              <span className="hidden md:inline">{name}</span>
+              <span className="md:hidden">{shortName}</span>
+            </button>
           ))}
-        </select>
+        </div>
       </div>
     );
   };
