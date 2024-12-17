@@ -7,6 +7,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Disclaimer from "./pages/Disclaimer";
 import ContactPage from "./pages/Contact";
 import Calendar from "./pages/Calendar";
+import Events from './pages/Events';
 
 function App() {
   
